@@ -14,3 +14,4 @@ bot = Bot(
     token=TOKEN,
     default=default_properties
 )
+wejonfoinewvmope
