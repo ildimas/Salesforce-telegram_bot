@@ -1,4 +1,3 @@
-
 import os
 from os import getenv
 
@@ -14,4 +13,3 @@ bot = Bot(
     token=TOKEN,
     default=default_properties
 )
-wejonfoinewvmope
