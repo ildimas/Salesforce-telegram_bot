@@ -163,3 +163,4 @@ cython_debug/
 envi/
 
 index_test.py
+.vscode/*

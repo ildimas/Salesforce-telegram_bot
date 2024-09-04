@@ -1,6 +1,6 @@
 from bot_instance import bot
 from routes.user_route import user_router
-    
+
 import asyncio
 import logging
 import sys
