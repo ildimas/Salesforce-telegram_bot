@@ -1,4 +1,4 @@
-from simple_salesforce import Salesforce, SalesforceMalformedRequest
+from simple_salesforce.api import Salesforce
 import os
 
 TOKEN = os.getenv("SF_TOKEN")
@@ -9,6 +9,29 @@ SECUTITY_TOKEN = os.getenv("SECUTITY_TOKEN")
 # sf = Salesforce(instance_url=INSTANCE, session_id=TOKEN)
 sf = Salesforce(username=USERNAME, password=PASSWORD, security_token=SECUTITY_TOKEN)
 
+query = "SELECT Id, Name FROM Account LIMIT 50"
+accounts = sf.query_all(query)
+
+for account in accounts['records']:
+    print(account['Id'], account['Name'])
+
+
+#*-----------------------------
+# new_account = sf.Account.create({
+#     'Name': 'New Account Name',
+#     'Phone': '1234567890'
+# })
+
+# print("New account created with ID:", new_account['id'])
+
+# sf.Account.update(new_account['id'], {
+#     'Phone': '0987654321'
+# })
+
+# print("Account updated successfully.")
+
+
+#*-----------------------------
 # new_account_data = {
 #     'Name': 'New Account Name',
 #     'Phone': '1234567890',
@@ -25,24 +48,3 @@ sf = Salesforce(username=USERNAME, password=PASSWORD, security_token=SECUTITY_TO
 #     print(f"New account created with ID: {new_account['id']}")
 # except SalesforceMalformedRequest as e:
 #     print(f"Failed to create account: {e.content}")
-
-
-# Second Example
-query = "SELECT Id, Name FROM Account LIMIT 50"
-accounts = sf.query_all(query)
-
-for account in accounts['records']:
-    print(account['Id'], account['Name'])
-
-# new_account = sf.Account.create({
-#     'Name': 'New Account Name',
-#     'Phone': '1234567890'
-# })
-
-# print("New account created with ID:", new_account['id'])
-
-# sf.Account.update(new_account['id'], {
-#     'Phone': '0987654321'
-# })
-
-# print("Account updated successfully.")
