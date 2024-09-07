@@ -1,5 +1,4 @@
 import os
-from os import getenv
 
 from aiogram import Bot, types
 from aiogram.client.default import DefaultBotProperties

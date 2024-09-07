@@ -5,6 +5,8 @@ services:
       context: .
     container_name: backend
     image: ildimas/bot_project:latest
+    env_file:
+      - .env
     depends_on:
       - db  
   db:
