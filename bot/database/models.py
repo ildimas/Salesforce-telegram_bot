@@ -10,7 +10,7 @@ class Company(Base):
     company_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     company_name = Column(String, nullable=False)
     company_hashed_password = Column(String, nullable=False)
-    company_corporeate_mail = Column(String, nullable=True, unique=True)
+    company_corporeate_mail = Column(String, nullable=True)
     company_phone = Column(String, nullable=True)
     company_website = Column(String, nullable=True)
     company_additional_info = Column(Text, nullable=True)

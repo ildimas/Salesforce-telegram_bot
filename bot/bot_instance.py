@@ -5,6 +5,7 @@ from aiogram.client.default import DefaultBotProperties
 from dotenv import load_dotenv
 load_dotenv()
 TOKEN = os.getenv("TOKEN")
+# print(TOKEN)
 
 default_properties = DefaultBotProperties(parse_mode="HTML")
 

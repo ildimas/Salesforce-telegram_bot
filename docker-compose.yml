@@ -7,6 +7,8 @@ services:
     image: ildimas/bot_project:latest
     env_file:
       - .env
+    environment:
+      DATABASEHOST: "db"
     depends_on:
       - db  
   db:
@@ -15,5 +17,7 @@ services:
     restart: always
     env_file:
       - .env
+    environment:
+      DATABASEHOST: "db"
     ports:
       - "5432:5432"
