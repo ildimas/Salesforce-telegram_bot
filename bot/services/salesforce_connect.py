@@ -26,6 +26,30 @@ async def sf_findout_comp_id(company_name):
     results = sf.query_all(query)
     for result in results['records']:
         return result['Id']
+    
+    
+async def sf_user_create(user_name):
+    data = {
+        'Name': user_name
+    }
+    try:
+        new_user = sf.TUser__c.create(data)
+        return new_user['id']
+    except SalesforceMalformedRequest as e:
+        print(f"Failed to create user", e)
+        
+        
+async def sf_ticket_create(ticket_name, user_sf_id, company_sf_id):
+    data = {
+        'Ticket Name': ticket_name,
+        'TUser' : user_sf_id,
+        'Company' : company_sf_id
+    }
+    try:
+        new_ticket = sf.Ticket__c.create(data)
+        return new_ticket['id']
+    except SalesforceMalformedRequest as e:
+        print(f"Failed to create ticker", e)
 
 # new_account_data = {
 #     'Name': 'New Account Name',

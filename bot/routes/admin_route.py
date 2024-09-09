@@ -3,7 +3,7 @@ from aiogram import Router, types, F
 from services.fsm import Admin, MainUsage
 from aiogram.fsm.context import FSMContext
 import services.keyboards as keyboard
-from DAL.admin_dal import AdminDAL
+from DAL.create_dal import CreateDAL
 from services.hashing import Hasher
 from database.db import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -18,7 +18,7 @@ admin_router = Router()
 hasher = Hasher()
 
 #! commands
-@admin_router.message(Command('admin'))
+@admin_router.message(Command('admin'), MainUsage.ticket_acsess)
 async def admin_auth(msg: types.Message, state : FSMContext) -> None:
     await msg.answer(f'Введите ваш ключ доступа:')
     await state.set_state(Admin.admin_verifying_key)
@@ -109,7 +109,7 @@ async def admin_creating_org_final(msg: types.Message, state: FSMContext) -> Non
     
     async for db_session in get_db():
         
-        adm_dal = AdminDAL(db_session)
+        adm_dal = CreateDAL(db_session)
         
         await adm_dal.create_company(name,
                                     password := hasher.get_password_hash(get_value(data, 'admin_company_creation_password')),

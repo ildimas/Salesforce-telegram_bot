@@ -13,6 +13,8 @@ class MainUsage(StatesGroup):
     ticket_acsess = State()
     changing_name = State()
     changing_org = State()
+    ticket_creation = State()
+    ticket_fill = State()
     
 class Admin(StatesGroup):
     admin_acsess = State()

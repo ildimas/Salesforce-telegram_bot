@@ -21,6 +21,7 @@ class Company(Base):
 class User(Base):
     __tablename__ = "users"
     user_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_sf_id = Column(String, nullable=False, unique=True)
     user_name = Column(String, nullable=False)
     user_telegramm_id = Column(Integer, nullable=False, unique=True)
     company_id = Column(UUID(as_uuid=True), ForeignKey('companies.company_id', ondelete="CASCADE"), nullable=False)
@@ -29,11 +30,7 @@ class User(Base):
 class Ticket(Base):
     __tablename__ = "tickets"
     ticket_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    ticket_sf_id = Column(String, nullable=False, unique=True)
     company_id = Column(UUID(as_uuid=True), ForeignKey('companies.company_id', ondelete="CASCADE"), nullable=False)
     user_id = Column(UUID(as_uuid=True), ForeignKey('users.user_id', ondelete="CASCADE"), nullable=False)
     ticket_name = Column(String, nullable=False)
-    ticket_priority = Column(
-        Integer, 
-        CheckConstraint('ticket_priority >= 1 AND ticket_priority <= 10', name='check_ticket_priority'),
-        nullable=False
-    )

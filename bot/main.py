@@ -1,6 +1,6 @@
 from bot_instance import bot
 from routes.reg_route import reg_router
-from routes.main_route import main_router
+from routes.ticket_route import ticket_router
 from routes.change_user_info_route import edit_router
 from routes.admin_route import admin_router
 from services.commands import set_bot_commands
@@ -13,6 +13,7 @@ dp = Dispatcher()
 dp.include_router(reg_router)
 dp.include_router(edit_router)
 dp.include_router(admin_router)
+dp.include_router(ticket_router)
 
 async def main() -> None:
     await set_bot_commands(bot)
