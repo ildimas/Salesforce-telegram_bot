@@ -3,6 +3,10 @@ from aiogram import Router, types
 from services.fsm import Registrarion, MainUsage
 from aiogram.fsm.context import FSMContext
 import services.keyboards as keyboard
+from database.db import get_db
+from DAL.reg_dal import RegDAL
+from DAL.user_dal import UserDAL
+from services.hashing import Hasher
 reg_router = Router()
 
 @reg_router.message(Command('start'))
@@ -16,9 +20,9 @@ async def one_start(msg: types.Message, state : FSMContext) -> None:
     
 @reg_router.callback_query(lambda c: c.data == 'name_accept', Registrarion.await_base_infromation)
 async def two_start(callback_query: types.CallbackQuery, state: FSMContext) -> None:
-    await state.set_state(Registrarion.await_organization)
-    await callback_query.answer("Вы успешно зарегистрировали пользователя !") 
-    await callback_query.message.answer("Выберите свою организацию из спсика:", reply_markup=await keyboard.inline_companies())
+    await state.set_state(Registrarion.await_organization_password)
+    await callback_query.answer() 
+    await callback_query.message.answer("Введите пароль от вашей организации: ")
     
 @reg_router.callback_query(lambda c: c.data == 'name_decline', Registrarion.await_base_infromation)
 async def three_start(callback_query: types.CallbackQuery, state: FSMContext) -> None:
@@ -36,26 +40,45 @@ async def handle_new_name(msg: types.Message, state: FSMContext) -> None:
     )
     await state.set_state(Registrarion.await_base_infromation)
     
-@reg_router.callback_query(lambda c: c.data.startswith('company_'), Registrarion.await_organization)
-async def company_selection(callback_query: types.CallbackQuery, state: FSMContext) -> None:
-    company = callback_query.data.split('_')[-1]
-    selected_company = company
-    await state.update_data(await_organization=selected_company)
-    await state.set_state(Registrarion.await_organization_password)
-    await callback_query.message.answer("Введите пароль для доступа к вашей организации:")
+# @reg_router.callback_query(lambda c: c.data.startswith('company_'), Registrarion.await_organization)
+# async def company_selection(callback_query: types.CallbackQuery, state: FSMContext) -> None:
+#     company = callback_query.data.split('_')[-1]
+#     selected_company = company
+#     await state.update_data(await_organization=selected_company)
+#     await state.set_state(Registrarion.await_organization_password)
+#     await callback_query.message.answer("Введите пароль для доступа к вашей организации:")
     
 @reg_router.message(Registrarion.await_organization_password)
 async def handle_org_password(msg: types.Message, state: FSMContext) -> None:
+    await state.update_data(await_organization_password=msg.text)
+    hashed_password = Hasher.get_password_hash(msg.text)
     #! Check if the password is valid
-    data = await state.get_data()
-    message_text = message_text = (
-            f"Вы успешно закончили процесс авторизации в системе отправки тикетов.\n\n"
-            f"Ваши данные:\n"
-            f"Имя: <b>{data['name']}</b>\n"
-            f"Компания: <b>{data['await_organization']}</b>\n\n"
-            f"Дальнейшие манипуляции вы можете совершать с помощью меню снизу:" 
+    async for db_session in get_db():
+        reg_dal = RegDAL(db_session)
+        companies = await reg_dal.get_all_companies()
+        company_name = company_id = None
+        for company in companies:
+            if Hasher.verify_password(plain_password=msg.text, hashed_password=company.company_hashed_password): 
+                company_name = company.company_name
+                company_id = company.company_id
+                break
+    if company_name is not None and company_id is not None:
+        await state.update_data(await_organization=company_name)
+        data = await state.get_data()
+        async for db_session in get_db():
+            user_dal = UserDAL(db_session)
+            user = await user_dal.create_user(name=data['name'], telegramm_id=msg.from_user.id, company_id=company_id)
+        message_text = message_text = (
+        f"Вы успешно закончили процесс авторизации в системе отправки тикетов.\n\n"
+        f"Ваши данные:\n"
+        f"Имя: <b>{data['name']}</b>\n"
+        f"Компания: <b>{data['await_organization']}</b>\n\n"
+        f"Дальнейшие манипуляции вы можете совершать с помощью меню снизу:" 
         )
-    
-    await msg.answer(message_text, reply_markup=keyboard.main_menu_keyboard)
-    await state.set_state(MainUsage.ticket_acsess)
+        await msg.answer(message_text, reply_markup=keyboard.main_menu_keyboard)
+        await state.set_state(MainUsage.ticket_acsess)
+    else:
+        await state.set_state(Registrarion.await_organization_password)
+        await msg.answer("Неверный пароль, введите пароль снова:")
+
     

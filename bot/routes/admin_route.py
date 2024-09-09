@@ -9,6 +9,7 @@ from database.db import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Generator
 import os
+from services.salesforce_connect import *
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -99,15 +100,26 @@ async def admin_creating_org_final(msg: types.Message, state: FSMContext) -> Non
         await state.update_data(admin_company_creation_additional_info = msg.text)
     data = await state.get_data()
     get_value = lambda d, key: d[key] if key in d else "-"
+    
+    name = get_value(data, 'admin_company_creation_name')
+    
+    #! Sf operations
+    sf_id = await sf_company_create(company_name=name)
+    # sf_id = await sf_findout_comp_id(company_name=name)
+    
     async for db_session in get_db():
+        
         adm_dal = AdminDAL(db_session)
-        await adm_dal.create_company(name := get_value(data, 'admin_company_creation_name'),
-                           password := hasher.get_password_hash(get_value(data, 'admin_company_creation_password')),
-                           phone := get_value(data, 'admin_company_creation_phone'),
-                           email := get_value(data, 'admin_company_creation_email'),
-                           add_info := get_value(data, 'admin_company_creation_additional_info'),
-                           website := get_value(data, 'admin_company_creation_website')
-                        )
+        
+        await adm_dal.create_company(name,
+                                    password := hasher.get_password_hash(get_value(data, 'admin_company_creation_password')),
+                                    phone := get_value(data, 'admin_company_creation_phone'),
+                                    email := get_value(data, 'admin_company_creation_email'),
+                                    add_info := get_value(data, 'admin_company_creation_additional_info'),
+                                    website := get_value(data, 'admin_company_creation_website'),
+                                    sf_id = sf_id
+                                    )
+        
     message_text = (
             f"Вы успешно закончили процесс создания команды.\n\n"
             f"Данные:\n"
@@ -115,6 +127,7 @@ async def admin_creating_org_final(msg: types.Message, state: FSMContext) -> Non
             f"Url: <b>{website}</b>\n"
             f"Email: <b>{email}</b>\n"
             f"Телефон: <b>{phone}</b>\n"
+            f"id salesforce: <b>{sf_id}</b>\n"
             f"Дополнительная информация: <b>{add_info}</b>\n\n"
             f"Дальнейшие манипуляции вы можете совершать с помощью меню снизу:" 
         )

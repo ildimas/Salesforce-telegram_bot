@@ -8,7 +8,8 @@ Base = declarative_base()
 class Company(Base):
     __tablename__ = "companies"
     company_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    company_name = Column(String, nullable=False)
+    company_name = Column(String, nullable=False, unique=True)
+    company_sf_id = Column(String, nullable=False, unique=True)
     company_hashed_password = Column(String, nullable=False)
     company_corporeate_mail = Column(String, nullable=True)
     company_phone = Column(String, nullable=True)
@@ -20,10 +21,9 @@ class Company(Base):
 class User(Base):
     __tablename__ = "users"
     user_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_phone = Column(String, nullable=True)
-    user_email = Column(String, nullable=True)
+    user_name = Column(String, nullable=False)
+    user_telegramm_id = Column(Integer, nullable=False, unique=True)
     company_id = Column(UUID(as_uuid=True), ForeignKey('companies.company_id', ondelete="CASCADE"), nullable=False)
-    user_additional_info = Column(Text, nullable=True)
     tickets = relationship("Ticket", backref="user", cascade="all, delete")
 
 class Ticket(Base):

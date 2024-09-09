@@ -11,3 +11,8 @@ class Hasher:
     @staticmethod
     def get_password_hash(password: str) -> str:
         return pwd_context.hash(password)
+    
+if __name__ == "__main__":
+    x = Hasher()
+    print(x.get_password_hash("12345"))
+    print(x.get_password_hash("12345"))

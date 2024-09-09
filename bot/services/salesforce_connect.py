@@ -1,13 +1,31 @@
 from simple_salesforce import Salesforce, SalesforceMalformedRequest
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
-TOKEN = os.getenv("SF_TOKEN")
+TOKEN_SF = os.getenv("TOKEN_SF")
 USERNAME = os.getenv("USERNAME")
 PASSWORD = os.getenv("PASSWORD")
 SECUTITY_TOKEN = os.getenv("SECUTITY_TOKEN")
 
-# sf = Salesforce(instance_url=INSTANCE, session_id=TOKEN)
+#! sf = Salesforce(instance_url=INSTANCE, session_id=TOKEN)
 sf = Salesforce(username=USERNAME, password=PASSWORD, security_token=SECUTITY_TOKEN)
+
+async def sf_company_create(company_name):
+    data = {
+        'Name': company_name
+    }
+    try:
+        new_company = sf.Company__c.create(data)
+        return new_company['id']
+    except SalesforceMalformedRequest as e:
+        print(f"Failed to create company", e)
+        
+async def sf_findout_comp_id(company_name):
+    query = f"SELECT Id FROM Company__c WHERE Name = '{company_name}' LIMIT 1"
+    results = sf.query_all(query)
+    for result in results['records']:
+        return result['Id']
 
 # new_account_data = {
 #     'Name': 'New Account Name',
@@ -27,13 +45,14 @@ sf = Salesforce(username=USERNAME, password=PASSWORD, security_token=SECUTITY_TO
 #     print(f"Failed to create account: {e.content}")
 
 
-# Second Example
-query = "SELECT Id, Name FROM Account LIMIT 50"
-accounts = sf.query_all(query)
+# #! Second Example
+# query = "SELECT Id, Name FROM Account LIMIT 50"
+# accounts = sf.query_all(query)
 
-for account in accounts['records']:
-    print(account['Id'], account['Name'])
+# for account in accounts['records']:
+#     print(account['Id'], account['Name'])
 
+#! Thired example
 # new_account = sf.Account.create({
 #     'Name': 'New Account Name',
 #     'Phone': '1234567890'
