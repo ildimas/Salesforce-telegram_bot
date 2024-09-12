@@ -5,7 +5,10 @@ from aiogram.fsm.context import FSMContext
 import services.keyboards as keyboard
 from database.db import get_db
 from DAL.select_dal import SelectDAL
-from services.salesforce_connect import sf_ticket_create
+from DAL.create_dal import CreateDAL
+from services.salesforce_connect import sf_ticket_create, sf_message_create
+import asyncio
+from web.fastapi import message_dict
 
 ticket_router = Router()
 
@@ -24,11 +27,31 @@ async def ticker_create(msg: types.Message, state: FSMContext) -> None:
     async for db_session in get_db():
         dal = SelectDAL(db_session)
         user_obj = await dal.get_user_by_telegramm_id(telegram_id=msg.from_user.id)
-        print(user_obj.company_id)
         company_obj = await dal.get_company_by_id(id=user_obj.company_id)
     ticket_sf_id = await sf_ticket_create(ticket_name=msg.text, user_sf_id=user_obj.user_sf_id, company_sf_id=company_obj.company_sf_id)
+    async for db_session in get_db():
+        dal = CreateDAL(db_session)
+        await dal.create_ticket(ticket_sf_id=ticket_sf_id, ticket_name=msg.text, company_id=company_obj.company_id, user_id=user_obj.user_id)
+    await state.set_state(MainUsage.ticket_processing)
+    await state.update_data(ticket_processing=ticket_sf_id)
+    await msg.answer(f"Id вашего тикета: {ticket_sf_id} - вы можете пользоваться этим чатом для связи с тех поддержкой. Опишите вашу проблему :)")
+    
+@ticket_router.message(MainUsage.ticket_processing)
+async def ticker_proc(msg: types.Message, state: FSMContext) -> None:
+   data = await state.get_data()
+   ticket_sf_id = data['ticket_processing']
+   body = msg.text
+   message_sf_id = await sf_message_create(ticket_sf_id=ticket_sf_id, body=body)
+   print(message_sf_id, "Создано")
+   print(ticket_sf_id, "айди тикета")
+   while True:
+        if ticket_sf_id in await message_dict.keys():
+            await msg.answer(await message_dict.get(ticket_sf_id))
+            await message_dict.delete(ticket_sf_id)
+        await asyncio.sleep(5)
         
-    await msg.answer(f"Тикет создан {ticket_sf_id} - пока все :)")
+
+
 
 
 #! handlers
@@ -36,3 +59,5 @@ async def ticker_create(msg: types.Message, state: FSMContext) -> None:
 #! callback querries 
 
 #! functions
+            
+            

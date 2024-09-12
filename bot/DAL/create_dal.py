@@ -1,5 +1,5 @@
 from database.db import async_session
-from database.models import User, Company
+from database.models import User, Company, Ticket
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from uuid import UUID
@@ -39,4 +39,16 @@ class CreateDAL:
             await self.db_session.rollback()
         return new_company
     
-    # async def create_ticket(self, )
+    async def create_ticket(self, ticket_sf_id : str, company_id : UUID, user_id : UUID, ticket_name : str) -> Ticket:
+        new_ticket = Ticket(
+            ticket_name=ticket_name,
+            user_id=user_id,
+            company_id=company_id,
+            ticket_sf_id=ticket_sf_id
+        )
+        self.db_session.add(new_ticket)
+        try:
+            await self.db_session.flush()
+        except IntegrityError:
+            await self.db_session.rollback()
+        return new_ticket

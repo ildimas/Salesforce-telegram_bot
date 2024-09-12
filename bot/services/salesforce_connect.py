@@ -41,15 +41,27 @@ async def sf_user_create(user_name):
         
 async def sf_ticket_create(ticket_name, user_sf_id, company_sf_id):
     data = {
-        'Ticket Name': ticket_name,
-        'TUser' : user_sf_id,
-        'Company' : company_sf_id
+        'Name': ticket_name,
+        'TUser__c' : user_sf_id,
+        'Company__c' : company_sf_id
     }
     try:
         new_ticket = sf.Ticket__c.create(data)
         return new_ticket['id']
     except SalesforceMalformedRequest as e:
         print(f"Failed to create ticker", e)
+        
+async def sf_message_create(ticket_sf_id, body):
+    data = {
+        'Ticket__c': ticket_sf_id,
+        'Type__c' : "incoming",
+        'Body__c' : body
+    }
+    try:
+        new_message = sf.Message__c.create(data)
+        return new_message['id']
+    except SalesforceMalformedRequest as e:
+        print(f"Failed to create message", e)
 
 # new_account_data = {
 #     'Name': 'New Account Name',

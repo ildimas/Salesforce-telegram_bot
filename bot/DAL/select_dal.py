@@ -24,10 +24,10 @@ class SelectDAL:
         query = select(User).where(User.user_telegramm_id == telegram_id)
         result = await self.db_session.execute(query)
         user = result.fetchone()
-        return user
+        return user[0] if user else None
     
     async def get_company_by_id(self, id : str) -> Company:
         query = select(Company).where(Company.company_id == id)
         result = await self.db_session.execute(query)
         company = result.fetchone()
-        return company
+        return company[0] if company else None

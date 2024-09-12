@@ -15,6 +15,7 @@ class MainUsage(StatesGroup):
     changing_org = State()
     ticket_creation = State()
     ticket_fill = State()
+    ticket_processing = State()
     
 class Admin(StatesGroup):
     admin_acsess = State()

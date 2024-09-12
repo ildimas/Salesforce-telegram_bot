@@ -7,6 +7,8 @@ from services.commands import set_bot_commands
 import asyncio
 import logging
 import sys
+from web.fastapi import app
+from uvicorn import Config, Server
 
 from aiogram import Dispatcher
 dp = Dispatcher()
@@ -15,10 +17,22 @@ dp.include_router(edit_router)
 dp.include_router(admin_router)
 dp.include_router(ticket_router)
 
-async def main() -> None:
+
+async def run_fastapi():
+    config = Config(app=app, host="0.0.0.0", port=8000, loop="asyncio")
+    server = Server(config=config)
+    await server.serve()
+
+
+async def start_aiogram():
     await set_bot_commands(bot)
     await dp.start_polling(bot)
-
+    
+async def main():
+    await asyncio.gather(
+        run_fastapi(),  # запуск web сервера и aiogramm совместно
+        start_aiogram()  
+    )
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
