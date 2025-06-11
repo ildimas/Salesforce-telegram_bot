@@ -11,7 +11,7 @@ class Company(Base):
     company_name = Column(String, nullable=False, unique=True)
     company_sf_id = Column(String, nullable=False, unique=True)
     company_hashed_password = Column(String, nullable=False)
-    company_corporeate_mail = Column(String, nullable=True)
+    company_corporate_mail = Column(String, nullable=True)
     company_phone = Column(String, nullable=True)
     company_website = Column(String, nullable=True)
     company_additional_info = Column(Text, nullable=True)
