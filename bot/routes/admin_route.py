@@ -133,7 +133,7 @@ async def admin_creating_org_final(msg: types.Message, state: FSMContext) -> Non
         )
     await msg.answer(message_text, reply_markup=keyboard.admin_menu_keyboard)
 
-#! callback querries 
+#! callback queries 
 
 
 #! functions

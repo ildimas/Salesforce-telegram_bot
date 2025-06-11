@@ -56,7 +56,7 @@ async def ticker_proc(msg: types.Message, state: FSMContext) -> None:
 
 #! handlers
 
-#! callback querries 
+#! callback queries 
 
 #! functions
             

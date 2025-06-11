@@ -42,7 +42,7 @@ async def handle_username_change(msg: types.Message, state: FSMContext) -> None:
     await msg.answer(f"Ваше новое имя <b>{new_name}</b>", reply_markup=keyboard.main_menu_keyboard)
     await state.set_state(MainUsage.ticket_acsess)
       
-#! callback querries 
+#! callback queries 
 
 @edit_router.callback_query(lambda c: c.data.startswith('company_'), MainUsage.changing_org)
 async def company_changing_callback_querry(callback_query: types.CallbackQuery, state: FSMContext) -> None:
