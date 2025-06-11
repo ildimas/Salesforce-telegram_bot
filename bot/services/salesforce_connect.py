@@ -6,10 +6,10 @@ load_dotenv()
 TOKEN_SF = os.getenv("TOKEN_SF")
 USERNAME = os.getenv("USERNAME")
 PASSWORD = os.getenv("PASSWORD")
-SECUTITY_TOKEN = os.getenv("SECUTITY_TOKEN")
+SECURITY_TOKEN = os.getenv("SECURITY_TOKEN")
 
 #! sf = Salesforce(instance_url=INSTANCE, session_id=TOKEN)
-sf = Salesforce(username=USERNAME, password=PASSWORD, security_token=SECUTITY_TOKEN)
+sf = Salesforce(username=USERNAME, password=PASSWORD, security_token=SECURITY_TOKEN)
 
 async def sf_company_create(company_name):
     data = {
