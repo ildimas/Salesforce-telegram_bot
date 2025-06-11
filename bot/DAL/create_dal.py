@@ -25,9 +25,9 @@ class CreateDAL:
         return new_user
     
     async def create_company(self, name : str, password : str, phone : str, email : str, add_info : str, website : str, sf_id : str) -> Company:
-        new_company = Company(company_name=name, 
+        new_company = Company(company_name=name,
                               company_hashed_password=password,
-                              company_corporeate_mail=email,
+                              company_corporate_mail=email,
                               company_phone=phone,
                               company_website=website,
                               company_additional_info=add_info,

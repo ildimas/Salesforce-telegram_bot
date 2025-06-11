@@ -24,7 +24,7 @@ def upgrade() -> None:
     sa.Column('company_id', sa.UUID(), nullable=False),
     sa.Column('company_name', sa.String(), nullable=False),
     sa.Column('company_hashed_password', sa.String(), nullable=False),
-    sa.Column('company_corporeate_mail', sa.String(), nullable=True),
+    sa.Column('company_corporate_mail', sa.String(), nullable=True),
     sa.Column('company_phone', sa.String(), nullable=True),
     sa.Column('company_website', sa.String(), nullable=True),
     sa.Column('company_additional_info', sa.Text(), nullable=True),
